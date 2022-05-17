@@ -1,4 +1,4 @@
-package dev.alimansour.googleauthapp.ui.theme
+package dev.alimansour.googleauthapp.presentation.theme
 
 import androidx.compose.material.Typography
 import androidx.compose.ui.text.TextStyle

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">GoogleAuthApp</string>
+    <string name="google_logo">Google Logo</string>
 </resources>
