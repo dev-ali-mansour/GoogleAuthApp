@@ -9,6 +9,4 @@ val SMALL_PADDING = 12.dp
 val EXTRA_SMALL_PADDING = 8.dp
  val TINY_PADDING = 6.dp
 
-val ButtonBorderWidth = 1.dp
 val ProgressIndicatorWidth = 2.dp
-
