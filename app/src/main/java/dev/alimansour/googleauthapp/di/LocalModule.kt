@@ -11,6 +11,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import dev.alimansour.googleauthapp.data.local.DataStoreOperationsImpl
+import dev.alimansour.googleauthapp.domain.loacal.DataStoreOperations
 import dev.alimansour.googleauthapp.util.Constants.PREFERENCES_NAME
 import javax.inject.Singleton
 
@@ -29,6 +30,6 @@ object LocalModule {
 
     @Singleton
     @Provides
-    fun provideDataStoreOperations(dataStore: DataStore<Preferences>): DataStoreOperationsImpl =
+    fun provideDataStoreOperations(dataStore: DataStore<Preferences>): DataStoreOperations =
         DataStoreOperationsImpl(dataStore = dataStore)
 }
