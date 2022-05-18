@@ -2,10 +2,67 @@ package dev.alimansour.googleauthapp.presentation.screen.common
 
 import android.app.Activity
 import android.util.Log
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.platform.LocalContext
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.Identity
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.common.api.CommonStatusCodes
 import dev.alimansour.googleauthapp.util.Constants.CLIENT_ID
+
+@Composable
+fun StartActivityForResult(
+    key: Any,
+    onResultReceived: (String) -> Unit,
+    onDialogDismissed: () -> Unit,
+    launcher: (ManagedActivityResultLauncher<IntentSenderRequest, ActivityResult>) -> Unit
+) {
+    val activity = LocalContext.current as Activity
+    val activityLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartIntentSenderForResult(),
+        onResult = { result ->
+            runCatching {
+                if (result.resultCode == Activity.RESULT_OK) {
+                    val oneTapClient = Identity.getSignInClient(activity)
+                    val credentials = oneTapClient.getSignInCredentialFromIntent(result.data)
+                    val tokenId = credentials.googleIdToken
+                    tokenId?.let {
+                        onResultReceived(it)
+                    } ?: run {
+                        Log.d("StartActivityForResult", "Black Scrim Clicked, Dialog Closed!")
+                        onDialogDismissed()
+                    }
+                }
+            }.onFailure { t ->
+                if (t is ApiException) {
+                    when (t.statusCode) {
+                        CommonStatusCodes.CANCELED -> {
+                            Log.d("StartActivityForResult", "One Tap Dialog Canceled!")
+                            onDialogDismissed()
+                        }
+                        CommonStatusCodes.NETWORK_ERROR -> {
+                            Log.d("StartActivityForResult", "One Tap Network Error!")
+                            onDialogDismissed()
+                        }
+                        else->{
+                            Log.d("StartActivityForResult", "${t.message}")
+                            onDialogDismissed()
+                        }
+                    }
+                }
+            }
+        })
+
+    LaunchedEffect(key1 = key) {
+        launcher(activityLauncher)
+    }
+}
 
 fun signIn(
     activity: Activity,
